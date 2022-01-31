@@ -47,9 +47,9 @@ BEGIN {
 
 our $DB = $ENV{"POSTGIS_REGRESS_DB"} || "postgis_reg";
 our $REGDIR = abs_path(dirname($0));
-our $SHP2PGSQL = $REGDIR . "/../loader/shp2pgsql";
-our $PGSQL2SHP = $REGDIR . "/../loader/pgsql2shp";
-our $RASTER2PGSQL = $REGDIR . "/../raster/loader/raster2pgsql";
+our $SHP2PGSQL = "/usr/pgsql-11/bin/shp2pgsql";
+our $PGSQL2SHP = "/usr/pgsql-11/bin/pgsql2shp";
+our $RASTER2PGSQL = "/usr/pgsql-11/bin/raster2pgsql";
 our $sysdiff = !system("diff --strip-trailing-cr $0 $0 2> /dev/null");
 
 ##################################################################
@@ -1338,7 +1338,7 @@ sub count_postgis_objects
 ##################################################################
 sub create_db
 {
-	my $createcmd = "createdb --encoding=UTF-8 --template=template0 --lc-collate=C $DB > $REGRESS_LOG";
+	my $createcmd = "/usr/pgsql-11/bin/createdb -h 127.0.0.1 -p 5433 -U yugabyte --encoding=UTF-8 --template=template0 --lc-collate=C $DB > $REGRESS_LOG";
 	return system($createcmd);
 }
 
@@ -1502,7 +1502,7 @@ sub prepare_spatial_extensions
 sub prepare_spatial
 {
 	my $version = shift;
-	my $scriptdir = scriptdir($version);
+	my $scriptdir = "/usr/pgsql-11/share/contrib/postgis-3.1";
 	print "Loading unpackaged components from $scriptdir\n";
 
 	print "Loading PostGIS into '${DB}' \n";
@@ -1868,22 +1868,26 @@ sub uninstall_spatial
 		$ok = drop_spatial();
 	}
 
-	if ( $ok )
-	{
-		show_progress(); # on to objects count
-		$OBJ_COUNT_POST = count_db_objects();
+	#my $psql_opts="--no-psqlrc --variable ON_ERROR_STOP=true";
+	#my $cmd = "psql $psql_opts -c \"DROP DATABASE postgis_reg;\" >> $REGRESS_LOG 2>&1";
+	#my $rv = system($cmd);
 
-		if ( $OBJ_COUNT_POST != $OBJ_COUNT_PRE )
-		{
-			fail("Object count pre-install ($OBJ_COUNT_PRE) != post-uninstall ($OBJ_COUNT_POST)");
-			return 0;
-		}
-		else
-		{
-			pass("($OBJ_COUNT_PRE)");
-			return 1;
-		}
-	}
+	#if ( $ok )
+	#{
+	#	show_progress(); # on to objects count
+	#	$OBJ_COUNT_POST = count_db_objects();
+
+	#	if ( $OBJ_COUNT_POST != $OBJ_COUNT_PRE )
+	#	{
+	#		fail("Object count pre-install ($OBJ_COUNT_PRE) != post-uninstall ($OBJ_COUNT_POST)");
+	#		return 0;
+	#	}
+	#	else
+	#	{
+	#		pass("($OBJ_COUNT_PRE)");
+	#		return 1;
+	#	}
+	#}
 
 	return 0;
 }

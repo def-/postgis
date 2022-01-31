@@ -1,0 +1,2 @@
+#!/bin/sh
+~/yugabyte-2.11.2.0/bin/ysqlsh "$@"
