@@ -1,2 +1,2 @@
 #!/bin/sh
-~/yugabyte-2.11.2.0/bin/ysqlsh "$@" | sed -e "s/^ysqlsh:[^ ]*:[0-9]*: //"
+~/yugabyte-2.11.2.0/bin/ysqlsh "$@" |& sed -e "s/^ysqlsh:[^ ]*:[0-9]*: //"
