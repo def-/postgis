@@ -47,9 +47,9 @@ BEGIN {
 
 our $DB = $ENV{"POSTGIS_REGRESS_DB"} || "postgis_reg";
 our $REGDIR = abs_path(dirname($0));
-our $SHP2PGSQL = "/usr/pgsql-11/bin/shp2pgsql";
-our $PGSQL2SHP = "/usr/pgsql-11/bin/pgsql2shp";
-our $RASTER2PGSQL = "/usr/pgsql-11/bin/raster2pgsql";
+our $SHP2PGSQL = $REGDIR . "/../loader/shp2pgsql";
+our $PGSQL2SHP = $REGDIR . "/../loader/pgsql2shp";
+our $RASTER2PGSQL = $REGDIR . "/../raster/loader/raster2pgsql";
 our $sysdiff = !system("diff --strip-trailing-cr $0 $0 2> /dev/null");
 
 ##################################################################
@@ -1338,7 +1338,7 @@ sub count_postgis_objects
 ##################################################################
 sub create_db
 {
-	my $createcmd = "/usr/pgsql-11/bin/createdb -h 127.0.0.1 -p 5433 -U yugabyte --encoding=UTF-8 --template=template0 --lc-collate=C $DB > $REGRESS_LOG";
+	my $createcmd = "createdb -h 127.0.0.1 -p 5433 -U yugabyte --encoding=UTF-8 --template=template0 --lc-collate=C $DB > $REGRESS_LOG";
 	return system($createcmd);
 }
 
@@ -1502,7 +1502,8 @@ sub prepare_spatial_extensions
 sub prepare_spatial
 {
 	my $version = shift;
-	my $scriptdir = "/usr/pgsql-11/share/contrib/postgis-3.1";
+	#my $scriptdir = "/usr/pgsql-11/share/contrib/postgis-3.1";
+	my $scriptdir = $ENV{"POSTGIS_SCRIPTDIR"} || scriptdir($version);
 	print "Loading unpackaged components from $scriptdir\n";
 
 	print "Loading PostGIS into '${DB}' \n";
